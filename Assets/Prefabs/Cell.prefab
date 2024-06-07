@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 936567354443318768}
   - component: {fileID: 8194836875529097098}
+  - component: {fileID: 2084453794295890966}
   m_Layer: 0
   m_Name: Cell
   m_TagString: Untagged
@@ -84,3 +85,25 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2084453794295890966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6163788169880533077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2631f65dbbf4d347ab5db4a5c2ada63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsFilled: 0
+  pipeType: 0
+  _pipePrefabs:
+  - {fileID: 9107896013096112591, guid: 119c54d1f7b45a742a94fe5aa6095369, type: 3}
+  - {fileID: 4039777400907009658, guid: 30efde0251767da489c7b69939eace1a, type: 3}
+  - {fileID: 4039777400907009658, guid: 377659790471ab8439893372fdceeb8e, type: 3}
+  - {fileID: 6823797990166231741, guid: 19a4ca64b38c5784ca07d442da9b27b7, type: 3}
+  - {fileID: 6860990809782506143, guid: f89629d0fb8ce644abad1b2eaaa4641a, type: 3}
+  - {fileID: 5392243591076727432, guid: 1eb35f84a6efe9a47bb1c11915a8b4cd, type: 3}
+  - {fileID: 2968553415801009054, guid: 5a5f958598a75a7499ac0e0d671d0fdc, type: 3}
