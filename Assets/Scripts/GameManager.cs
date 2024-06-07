@@ -21,10 +21,10 @@ public class GameManager : MonoBehaviour
             Destroy(Instance);
         Instance = this;
 
-        SpwanLevel();
+        SpawnLevel();
     }
 
-    private void SpwanLevel()
+    private void SpawnLevel()
     {
         pipes = new Pipe[_level.row, _level.column];
         startPipes = new List<Pipe>();
