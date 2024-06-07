@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class GameManager : MonoBehaviour
     private Pipe[,] pipes; // Khai bao mang 2 chieu
     private List<Pipe> startPipes;
 
+    private WaitForSeconds timeCheck = new WaitForSeconds(.1f);
 
     private void Awake()
     {
@@ -61,5 +63,106 @@ public class GameManager : MonoBehaviour
         cameraPos.x = _level.column /2f;
         cameraPos.y = _level.row /2f;
         Camera.main.transform.position = cameraPos;
+    }
+
+    private void Update()
+    {
+        //Neu hoan thanh level thi khong lam gi
+        if (hasGameFinished) return;
+
+        //Lay toa do cua chuot khi nhan vao man hinh
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        //Lam tron cac toa do cua chuot de chuyen qua gia tri cua row va columm
+        int row = Mathf.FloorToInt(mousePos.y);
+        int col = Mathf.FloorToInt(mousePos.x);
+
+        //Kiem tra neu khong an chuot vao cac ong nuoc thi khong lam gi
+        if (row < 0 || col < 0) return;
+        if (row >=  _level.row || col >= _level.column) return;
+
+        //Khi an vao cac ong nuoc thi se lam cho cac ong nuoc xoay
+        if (Input.GetMouseButtonDown(0))
+        {
+            pipes[row, col].UpdateInput();
+            StartCoroutine(ShowHint());
+        }
+    }
+
+    //Sau 0.1s kiem tra xem co thang khong
+    private IEnumerator ShowHint()
+    {
+        yield return timeCheck;
+        CheckFill();
+        checkWin();
+    }
+
+    //Kiem tra de tao cac ong co nuoc
+    private void CheckFill()
+    {
+        for (int i = 0; i < _level.row; i++)
+        {
+            for (int j = 0; j < _level.column; j++)
+            {
+                Pipe tempPipe = pipes[i, j];
+
+                if (tempPipe.pipeType != 0) tempPipe.isFilled = false;
+            }
+        }
+
+        Queue<Pipe> check = new Queue<Pipe>();
+        HashSet<Pipe> finished = new HashSet<Pipe>();
+
+        foreach (var pipe in startPipes) 
+        { 
+            check.Enqueue(pipe);
+        }
+
+        while (check.Count > 0)
+        {
+            Pipe pipe = check.Dequeue();
+            finished.Add(pipe);
+            List<Pipe> connected = pipe.ConnectPipes();
+            foreach (var connectedPipe in connected)
+            {
+                if (!finished.Contains(connectedPipe)) check.Enqueue(connectedPipe);
+            }
+        }
+
+        foreach (var filled in finished)
+        {
+            filled.isFilled = true;
+        }
+
+        for (int i = 0; i < _level.row; i++)
+        {
+            for (int j = 0; j < _level.column; j++)
+            {
+                Pipe tempPipe = pipes[i, j];
+                tempPipe.UpdateFilled();
+            }
+        }
+    }
+
+    //Kiem tra da thang chua
+    private void checkWin()
+    {
+        for (int i =  0; i < _level.row; i++)
+        {
+            for (int j = 0; j < _level.column; j++)
+            {
+                //Neu con ong nuoc chua co nuoc thi khong lam gi
+                if (!pipes[i, j].isFilled) return; 
+            }
+        }
+        hasGameFinished = true;
+        StartCoroutine(GameFinished());
+    }
+
+    //2 giay sau khi win game load lai scene
+    private IEnumerator GameFinished()
+    {
+        WaitForSeconds timeWin = new WaitForSeconds(2f);
+        yield return timeWin;
+        SceneManager.LoadScene(0);
     }
 }
