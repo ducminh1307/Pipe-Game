@@ -11,6 +11,8 @@ public class Generator : MonoBehaviour
     [SerializeField] private LevelData _level;
     [SerializeField] private SpawnCell _cellPrefab;
 
+    [SerializeField] private int _row, _col;
+
     private bool hasGameFinished;
     private SpawnCell[,] pipes; // Khai bao mang 2 chieu
     private List<SpawnCell> startPipes;
@@ -23,6 +25,7 @@ public class Generator : MonoBehaviour
             Destroy(Instance);
         Instance = this;
 
+        CreateLevelData();
         SpawnLevel();
     }
 
@@ -64,6 +67,21 @@ public class Generator : MonoBehaviour
         cameraPos.x = _level.column / 2f;
         cameraPos.y = _level.row / 2f;
         Camera.main.transform.position = cameraPos;
+    }
+
+    private void CreateLevelData()
+    {
+        _level.row = _row;
+        _level.column = _col;
+        _level.data = new List<int>();
+
+        for (int i = 0; i < _level.row; i++)
+        {
+            for (int j = 0; j < _level.column; j++)
+            {
+                _level.data.Add(0);
+            }
+        }
     }
 
     private void Update()

@@ -37,6 +37,10 @@ public class Pipe : MonoBehaviour
         currentPipe = Instantiate(_pipePrefabs[pipeType], transform);
         currentPipe.transform.localPosition = Vector3.zero; // Dua pine ve vi tri mac dinh la (0,0) so voi Cell
 
+        //Neu la o trong va pipe_1 thi se co nuoc
+        if (pipeType == 0 || pipeType == 1)
+            isFilled = true;
+
         //Neu la Cell rong thi khong lam gi
         if (pipeType == 0)
             return;
@@ -48,10 +52,6 @@ public class Pipe : MonoBehaviour
             rotation = Random.Range(minRotation, maxRotation + 1);
 
         currentPipe.transform.eulerAngles = new Vector3(0, 0, rotation * rotationMultiplier);
-
-        //Neu la o trong va pipe_1 thi se co nuoc
-        if (pipeType == 0 || pipeType == 1)
-            isFilled = true;        
 
         //Bat/tat sprite co nuoc cua pipe theo isFilled
         emptySprite = currentPipe.GetChild(0).GetComponent<SpriteRenderer>();
