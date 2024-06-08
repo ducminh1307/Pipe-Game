@@ -1,19 +1,19 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour
+public class Generator : MonoBehaviour
 {
-    public static GameManager Instance;
+    public static Generator Instance;
 
     [SerializeField] private LevelData _level;
-    [SerializeField] private Pipe _cellPrefab;
+    [SerializeField] private SpawnCell _cellPrefab;
 
     private bool hasGameFinished;
-    private Pipe[,] pipes; // Khai bao mang 2 chieu
-    private List<Pipe> startPipes;
+    private SpawnCell[,] pipes; // Khai bao mang 2 chieu
+    private List<SpawnCell> startPipes;
 
     private WaitForSeconds timeCheck = new WaitForSeconds(.1f);
 
@@ -30,18 +30,18 @@ public class GameManager : MonoBehaviour
     private void SpawnLevel()
     {
         // Khoi tao mang 2 chieu co chieu dai la _level.column phan tu, chieu rong la _level.row phan tu
-        pipes = new Pipe[_level.row, _level.column];
-        startPipes = new List<Pipe>();
+        pipes = new SpawnCell[_level.row, _level.column];
+        startPipes = new List<SpawnCell>();
 
         for (int i = 0; i < _level.row; i++)
         {
-            for (int j = 0; j <  _level.column; j++)
+            for (int j = 0; j < _level.column; j++)
             {
                 //Tinh toan toa do sinh ra cua Cell
                 Vector2 spawnPos = new Vector2(j + .5f, i + .5f);
 
                 //Tao Cell voi toa do da tinh
-                Pipe tempPipe = Instantiate(_cellPrefab);
+                SpawnCell tempPipe = Instantiate(_cellPrefab);
                 tempPipe.transform.position = spawnPos;
 
                 //Khoi tao pipe bang gia tri dua vao cac phan tu cua _level.datas
@@ -61,8 +61,8 @@ public class GameManager : MonoBehaviour
 
         //Tinh toan va dat vi tri camera o giua level duoc tao ra
         Vector3 cameraPos = Camera.main.transform.position;
-        cameraPos.x = _level.column /2f;
-        cameraPos.y = _level.row /2f;
+        cameraPos.x = _level.column / 2f;
+        cameraPos.y = _level.row / 2f;
         Camera.main.transform.position = cameraPos;
     }
 
@@ -79,7 +79,7 @@ public class GameManager : MonoBehaviour
 
         //Kiem tra neu khong an chuot vao cac ong nuoc thi khong lam gi
         if (row < 0 || col < 0) return;
-        if (row >=  _level.row || col >= _level.column) return;
+        if (row >= _level.row || col >= _level.column) return;
 
         //Khi an vao cac ong nuoc thi se lam cho cac ong nuoc xoay
         if (Input.GetMouseButtonDown(0))
@@ -87,14 +87,51 @@ public class GameManager : MonoBehaviour
             pipes[row, col].UpdateInput();
             StartCoroutine(ShowHint());
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            pipes[row, col].Init(0);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            pipes[row, col].Init(1);
+        }
+
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            pipes[row, col].Init(2);
+        }
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            pipes[row, col].Init(3);
+        }
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            pipes[row, col].Init(4);
+        }
+
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            pipes[row, col].Init(5);
+        }
+
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            pipes[row, col].Init(6);
+        }
+
+        StartCoroutine(ShowHint());
     }
 
     //Sau 0.1s kiem tra xem co thang khong
     private IEnumerator ShowHint()
     {
         yield return timeCheck;
+        ResetStartPipe();
         CheckFill();
-        checkWin();
     }
 
     //Kiem tra de tao cac ong co nuoc
@@ -105,26 +142,26 @@ public class GameManager : MonoBehaviour
         {
             for (int j = 0; j < _level.column; j++)
             {
-                Pipe tempPipe = pipes[i, j];
+                SpawnCell tempPipe = pipes[i, j];
 
                 if (tempPipe.pipeType != 0) tempPipe.isFilled = false;
             }
         }
 
-        Queue<Pipe> check = new Queue<Pipe>(); // Khoi tao mot hang doi de luu tru cac Pipe
-        HashSet<Pipe> finished = new HashSet<Pipe>(); // Tao mot tap hop chua cac Pipe khong trung nhau khi duyet xog
+        Queue<SpawnCell> check = new Queue<SpawnCell>(); // Khoi tao mot hang doi de luu tru cac Pipe
+        HashSet<SpawnCell> finished = new HashSet<SpawnCell>(); // Tao mot tap hop chua cac Pipe khong trung nhau khi duyet xog
 
-        foreach (var pipe in startPipes) 
-        { 
+        foreach (var pipe in startPipes)
+        {
             check.Enqueue(pipe); // Them cac pipe_1 vao trong hang doi
         }
 
         while (check.Count > 0)
         {
-            Pipe pipe = check.Dequeue(); // Lay pipe dau tien ra khoi hang doi
+            SpawnCell pipe = check.Dequeue(); // Lay pipe dau tien ra khoi hang doi
             finished.Add(pipe); // dua pipe do vao trong HashSet
 
-            List<Pipe> connected = pipe.ConnectPipes(); //Lay cac ong co ket noi voi ong dau
+            List<SpawnCell> connected = pipe.ConnectPipes(); //Lay cac ong co ket noi voi ong dau
 
             foreach (var connectedPipe in connected)
             {
@@ -144,32 +181,41 @@ public class GameManager : MonoBehaviour
         {
             for (int j = 0; j < _level.column; j++)
             {
-                Pipe tempPipe = pipes[i, j];
+                SpawnCell tempPipe = pipes[i, j];
                 tempPipe.UpdateFilled();
             }
         }
     }
 
-    //Kiem tra da thang chua
-    private void checkWin()
+    //Reset start pipe
+    public void ResetStartPipe()
     {
-        for (int i =  0; i < _level.row; i++)
+        startPipes = new List<SpawnCell> ();
+
+        for (int i = 0; i < _level.row; i++)
         {
             for (int j = 0; j < _level.column; j++)
             {
-                //Neu con ong nuoc chua co nuoc thi khong lam gi
-                if (!pipes[i, j].isFilled) return; 
+                if (pipes[i, j].pipeType == 1)
+                {
+                    startPipes.Add(pipes[i, j]);
+                }
             }
         }
-        hasGameFinished = true;
-        StartCoroutine(GameFinished());
     }
 
-    //2 giay sau khi win game load lai scene
-    private IEnumerator GameFinished()
+    // Luu du lieu
+    public void SaveData()
     {
-        WaitForSeconds timeWin = new WaitForSeconds(2f);
-        yield return timeWin;
-        SceneManager.LoadScene(0);
+        for (int i = 0; i < _level.row; ++i)
+        {
+            for (int j = 0; j < _level.column; ++j)
+            {
+                _level.data[i * _level.column + j] = pipes[i, j].pipeData;
+            }
+        }
+
+        // Cap nhat du lieu cua ScriptableObject level
+        EditorUtility.SetDirty(_level);
     }
 }

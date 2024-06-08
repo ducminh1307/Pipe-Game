@@ -1,15 +1,13 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.U2D;
-using Random = UnityEngine.Random;
 
-public class Pipe : MonoBehaviour
+public class SpawnCell : MonoBehaviour
 {
-
-    public bool isFilled;
+    [HideInInspector] public bool isFilled;
     [HideInInspector] public int pipeType;
+
+    public int pipeData => pipeType + rotation * 10;
 
     [SerializeField] private Transform[] _pipePrefabs;
 
@@ -30,6 +28,12 @@ public class Pipe : MonoBehaviour
     /// <param name="pipe"></param>
     public void Init(int pipe)
     {
+        //s
+        if (currentPipe != null)
+        {
+            Destroy(currentPipe.gameObject);
+        }
+
         //Tao loai ong bang cach chia lay phan du
         pipeType = pipe % 10;
 
@@ -49,9 +53,9 @@ public class Pipe : MonoBehaviour
 
         currentPipe.transform.eulerAngles = new Vector3(0, 0, rotation * rotationMultiplier);
 
-        //Neu la o trong va pipe_1 thi se co nuoc
-        if (pipeType == 0 || pipeType == 1)
-            isFilled = true;        
+        //Neu la pipe_1 thi se co nuoc
+        if (pipeType == 1)
+            isFilled = true;
 
         //Bat/tat sprite co nuoc cua pipe theo isFilled
         emptySprite = currentPipe.GetChild(0).GetComponent<SpriteRenderer>();
@@ -73,8 +77,8 @@ public class Pipe : MonoBehaviour
     /// </summary>
     public void UpdateInput()
     {
-        //Neu la Cell rong, pipe_1, pipe_2 thi khong xoay duoc
-        if (pipeType == 0 || pipeType == 1 || pipeType == 2)
+        //Neu la Cell rong thi khong xoay duoc
+        if (pipeType == 0)
             return;
 
         //Xoay them 90 do
@@ -96,10 +100,10 @@ public class Pipe : MonoBehaviour
     /// Kiem tra va dua ra ket qua cac ong nuoc duoc noi voi Pipe
     /// </summary>
     /// <returns>Cac ong nuoc duoc noi</returns>
-    public List<Pipe> ConnectPipes()
+    public List<SpawnCell> ConnectPipes()
     {
         //Khoi tao list result de chua cac pipe ket noi voi Pipe
-        List<Pipe> result = new List<Pipe>();
+        List<SpawnCell> result = new List<SpawnCell>();
 
         //Lay tung collider cua Pipe ra kiem tra
         foreach (var box in connectBoxes)
@@ -107,7 +111,7 @@ public class Pipe : MonoBehaviour
             //Do tia ban tu tung collider cua Pipe de lay tat ca cac Pipe co collider cham vao collider cua Pipe
             RaycastHit2D[] hit = Physics2D.RaycastAll(box.transform.position, Vector2.zero, 0.1f);
             for (int i = 0; i < hit.Length; i++)
-                result.Add(hit[i].collider.transform.parent.parent.GetComponent<Pipe>()); //Them Pipe noi voi Pipe vao result
+                result.Add(hit[i].collider.transform.parent.parent.GetComponent<SpawnCell>()); //Them Pipe noi voi Pipe vao result
                 //(collier la con cua pipe, pipe la con cua Cell, Cell chua component Pipe)
         }
 
