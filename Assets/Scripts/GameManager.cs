@@ -86,6 +86,10 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        if (currentLevel >= _levels.Count)
+        {
+            return;
+        }
         //Neu hoan thanh level thi khong lam gi
         if (hasGameFinished || isGameOver) return;
 
@@ -141,7 +145,6 @@ public class GameManager : MonoBehaviour
         { 
             check.Enqueue(pipe); // Them cac pipe_1 vao trong hang doi
         }
-
         while (check.Count > 0)
         {
             Pipe pipe = check.Dequeue(); // Lay pipe dau tien ra khoi hang doi
@@ -157,9 +160,11 @@ public class GameManager : MonoBehaviour
         }
 
         // Doi trang thai cac ong co noi voi nhau sang "true"
-        foreach (var filled in finished)
+        foreach (var pipe in finished)
         {
-            filled.isFilled = true;
+            //Neu cac ong nuoc chua noi tat ca dau thi khong the chay nuoc
+            if (pipe.canFill)
+                pipe.isFilled = true;
         }
 
         // Hien thi cac ong co trang thai isFilled

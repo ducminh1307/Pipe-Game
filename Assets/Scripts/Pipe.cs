@@ -7,8 +7,9 @@ using Random = UnityEngine.Random;
 
 public class Pipe : MonoBehaviour
 {
-
+    //[HideInInspector] public bool isFilled;
     public bool isFilled;
+    public bool canFill { get; private set; }
     [HideInInspector] public int pipeType;
 
     [SerializeField] private Transform[] _pipePrefabs;
@@ -39,7 +40,10 @@ public class Pipe : MonoBehaviour
 
         //Neu la o trong va pipe_1 thi se co nuoc
         if (pipeType == 0 || pipeType == 1)
+        {
             isFilled = true;
+            canFill = true;
+        }
 
         //Neu la Cell rong thi khong lam gi
         if (pipeType == 0)
@@ -100,16 +104,30 @@ public class Pipe : MonoBehaviour
     {
         //Khoi tao list result de chua cac pipe ket noi voi Pipe
         List<Pipe> result = new List<Pipe>();
+        //Khoi tao so ong nuoc da lien ket
+        int connectedPipe = 0;
 
         //Lay tung collider cua Pipe ra kiem tra
         foreach (var box in connectBoxes)
         {
-            //Do tia ban tu tung collider cua Pipe de lay tat ca cac Pipe co collider cham vao collider cua Pipe
-            RaycastHit2D[] hit = Physics2D.RaycastAll(box.transform.position, Vector2.zero, 0.1f);
-            for (int i = 0; i < hit.Length; i++)
-                result.Add(hit[i].collider.transform.parent.parent.GetComponent<Pipe>()); //Them Pipe noi voi Pipe vao result
+            //Lay tat ca cac Pipe co collider cham vao collider cua Pipe
+            Collider2D[] hits = Physics2D.OverlapCircleAll(box.transform.position, 0.15f);
+            for (int i = 0; i < hits.Length; i++)
+            {
+                result.Add(hits[i].transform.parent.parent.GetComponent<Pipe>()); //Them Pipe noi voi Pipe vao result
                 //(collier la con cua pipe, pipe la con cua Cell, Cell chua component Pipe)
+                connectedPipe++;
+            }
         }
+
+        //Tru di cac dau cua ong nuoc
+        connectedPipe -= connectBoxes.Count;
+
+        //Kiem tra neu tat ca cac ong nuoc duoc noi thi canFill = true
+        if (connectedPipe == connectBoxes.Count)
+            canFill = true;
+        else
+            canFill = false;
 
         return result;
     }
