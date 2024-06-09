@@ -157,9 +157,10 @@ public class GameManager : MonoBehaviour
         }
 
         // Doi trang thai cac ong co noi voi nhau sang "true"
-        foreach (var filled in finished)
+        foreach (var pipe in finished)
         {
-            filled.isFilled = true;
+            if (pipe.canFill)
+                pipe.isFilled = true;
         }
 
         // Hien thi cac ong co trang thai isFilled
