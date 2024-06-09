@@ -2019,8 +2019,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _level: {fileID: 11400000, guid: 5fd16e47d0118d74f8403b292e683c83, type: 2}
   _cellPrefab: {fileID: 972393250215861070, guid: d4f5d06c5bf8d964faa060bdcff870ed, type: 3}
-  _row: 5
-  _col: 5
+  _row: 4
+  _col: 4
+  turns: 20
 --- !u!4 &1836568003
 Transform:
   m_ObjectHideFlags: 0

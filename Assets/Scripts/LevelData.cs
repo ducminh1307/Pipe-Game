@@ -8,6 +8,7 @@ public class LevelData : ScriptableObject
 
     public int row;
     public int column;
+    public int turns;
     public List<int> data;
 
 }

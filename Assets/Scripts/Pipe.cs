@@ -46,10 +46,10 @@ public class Pipe : MonoBehaviour
             return;
 
         //Neu la pipe_1 hoac pipe_2 thi xoay theo ket qua chia lay phan nguyen neu la cac pipe con lai thi xoay random 90, 180, 270 do
-        if (pipeType == 1 || pipeType == 2)
+        if (pipeType != 0)
             rotation = pipe / 10;
-        else
-            rotation = Random.Range(minRotation, maxRotation + 1);
+        //else
+        //    rotation = Random.Range(minRotation, maxRotation + 1);
 
         currentPipe.transform.eulerAngles = new Vector3(0, 0, rotation * rotationMultiplier);
 

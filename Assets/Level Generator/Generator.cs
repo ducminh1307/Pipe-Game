@@ -8,10 +8,13 @@ public class Generator : MonoBehaviour
 {
     public static Generator Instance;
 
+    [Header("Elements")]
     [SerializeField] private LevelData _level;
     [SerializeField] private SpawnCell _cellPrefab;
 
+    [Header("Datas")]
     [SerializeField] private int _row, _col;
+    [SerializeField] private int turns;
 
     private bool hasGameFinished;
     private SpawnCell[,] pipes; // Khai bao mang 2 chieu
@@ -232,6 +235,8 @@ public class Generator : MonoBehaviour
                 _level.data[i * _level.column + j] = pipes[i, j].pipeData;
             }
         }
+
+        _level.turns = turns;
 
         // Cap nhat du lieu cua ScriptableObject level
         EditorUtility.SetDirty(_level);
